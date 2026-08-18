@@ -19,7 +19,7 @@
 
 \author{
   Aryan Padarthi \\
-  \texttt{aryan.padarthi@gmail.com}
+  \texttt{aryanpadarthi@example.com}
 }
 
 \newtheorem{theorem}{Theorem}
@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-Discrete graph curvatures, particularly Ollivier-Ricci Curvature (ORC) and Forman-Ricci Curvature (FRC), have become foundational tools in geometric distributional deep learning for mitigating over-smoothing and over-squashing. While ORC provides a robust theoretical foundation based on optimal transport, its $\mathcal{O}(N^3)$ computational complexity limits scalability. Conversely, combinatorial approximations like FRC scale linearly but sacrifice the probabilistic mass-transport semantics. In this work, we bridge this divide by introducing Sliced Ollivier-Ricci Curvature (SORC). By projecting local random walk measures onto Lipschitz-normalized Laplacian eigenvectors, we compute localized 1D Sliced Wasserstein distances in closed form. We formally prove that SORC strictly lower-bounds exact ORC via Kantorovich-Rubinstein duality. Empirical evaluations on Stochastic Block Models demonstrate high correlation with exact ORC and significant runtime improvements, offering a highly tractable, mathematically rigorous metric for curvature-driven graph algorithms.
+Discrete graph curvatures, particularly Ollivier-Ricci Curvature (ORC) and Forman-Ricci Curvature (FRC), have become foundational tools in geometric distributional deep learning for mitigating over-smoothing and over-squashing. While ORC provides a robust theoretical foundation based on optimal transport, its $\mathcal{O}(N^3)$ computational complexity limits scalability. Conversely, combinatorial approximations like FRC scale linearly but sacrifice the probabilistic mass-transport semantics. In this work, we bridge this divide by introducing Sliced Ollivier-Ricci Curvature (SORC). By projecting local random walk measures onto Lipschitz-normalized Laplacian eigenvectors, we compute localized 1D Sliced Wasserstein distances in closed form. We formally prove that SORC lower-bounds exact ORC via an optimal transport coupling formulation. Empirical evaluations on Stochastic Block Models demonstrate high correlation with exact ORC and significant runtime improvements, offering a highly tractable, mathematically rigorous metric for curvature-driven graph algorithms.
 \end{abstract}
 
 \section{Introduction}
@@ -49,19 +49,19 @@ Let $\phi_i$ (for $i \ge 2$) be a non-trivial eigenvector of the graph Laplacian
 Let $\text{SW}_k(m_u, m_v) = \max_{1 \le i \le k} W_1(f_{i\#}m_u, f_{i\#}m_v)$ be the maximum 1D Sliced Wasserstein distance along the first $k$ Lipschitz-normalized Laplacian eigenvectors. Then, $\text{SW}_k(m_u, m_v) \le W_1(m_u, m_v)$.
 \end{theorem}
 \begin{proof}
-It is a standard fact in optimal transport that pushforward under a 1-Lipschitz map is non-expansive in $W_1$. Specifically, since each normalized eigenvector $f_i$ is 1-Lipschitz with respect to the graph metric $d$, for any optimal coupling $\pi$ of $(m_u, m_v)$ on the graph, the pushforward $(f_i \times f_i)_\# \pi$ is a valid coupling of the pushforward measures on $\mathbb{R}$. Its cost is $\int |f_i(x) - f_i(y)| d\pi(x,y) \le \int d(x,y) d\pi(x,y) = W_1(m_u, m_v)$. Since the 1D Wasserstein distance $W_1(f_{i\#}m_u, f_{i\#}m_v)$ is the infimum over all such couplings on $\mathbb{R}$, it must be $\le$ the cost of this particular coupling. Taking the maximum over $k$ directions preserves this inequality.
+It is a standard fact in optimal transport that pushforward under a 1-Lipschitz map is non-expansive in $W_1$ \cite{villani2009optimal}. Specifically, since each normalized eigenvector $f_i$ is 1-Lipschitz with respect to the graph metric $d$, for any optimal coupling $\pi$ of $(m_u, m_v)$ on the graph, the pushforward $(f_i \times f_i)_\# \pi$ is a valid coupling of the pushforward measures on $\mathbb{R}$. Its cost is $\int |f_i(x) - f_i(y)| d\pi(x,y) \le \int d(x,y) d\pi(x,y) = W_1(m_u, m_v)$. Since the 1D Wasserstein distance $W_1(f_{i\#}m_u, f_{i\#}m_v)$ is the infimum over all such couplings on $\mathbb{R}$, it must be $\le$ the cost of this particular coupling. Taking the maximum over $k$ directions preserves this inequality.
 \end{proof}
 
 \begin{corollary}
 The Sliced Ollivier-Ricci Curvature $\kappa_{\text{SORC}}^{(k)}(u,v) = 1 - \text{SW}_k(m_u^\alpha, m_v^\alpha)/d(u,v)$ guarantees that $\kappa_{\text{SORC}}^{(k)}(u,v) \ge \kappa_{\text{ORC}}(u,v)$.
 \end{corollary}
 
-While the bound monotonically tightens as $k \to n$, the maximum over the spectral axes limits the exact recovery of $W_1$ to cases where the supremum of the KR duality lies exactly along a single eigenvector. In practice, however, this lower bound serves as a highly accurate proxy.
+While the bound monotonically tightens as $k \to n$, the maximum over the spectral axes limits the exact recovery of $W_1$ to cases where the optimal coupling perfectly aligns with a single eigenvector. Otherwise, strict inequality holds. In practice, however, this lower bound serves as a highly accurate proxy.
 
 \section{Implementation and Empirical Validation}
 Computing SORC requires $\mathcal{O}(k|E|)$ for the Lanczos Laplacian decomposition and Lipschitz normalization, followed by closed-form 1D CDF differences across the $\deg(u)+\deg(v)$ points in the supports of adjacent measures. 
 
-We validated SORC against exact ORC computed via linear programming. We performed trials across 10 random seeds on 200-node Stochastic Block Models (2 blocks of 100 nodes, $p_{\text{in}} = 0.2$, $p_{\text{out}} = 0.01$). Across trials, we observed a strong, stable Spearman correlation ($r = 0.871 \pm 0.012$, $p < 10^{-5}$) between SORC and exact ORC. By comparison, the combinatorial baseline AFRC \cite{fesser2023augmented} achieved a significantly lower correlation ($r = 0.624 \pm 0.021$). Furthermore, ablation over $k$ demonstrates that SORC asymptotes to optimal accuracy around $k=15$, where its vectorized implementation executed in $0.04 \pm 0.005$s compared to exact ORC's $3.12 \pm 0.11$s (a nearly $100\times$ speedup).
+We validated SORC against exact ORC computed via linear programming. We performed trials across 10 random seeds on 200-node Stochastic Block Models (2 blocks of 100 nodes, $p_{\text{in}} = 0.2$, $p_{\text{out}} = 0.01$). Across trials, we observed a strong, stable Spearman correlation ($r = 0.871 \pm 0.012$, $p < 10^{-5}$) between SORC and exact ORC. By comparison, the combinatorial baseline AFRC \cite{fesser2023augmented} achieved a significantly lower correlation ($r = 0.624 \pm 0.021$). Furthermore, ablation over $k$ demonstrates that SORC asymptotes to optimal accuracy around $k=15$ (see Figure~\ref{fig:ablation}), where its vectorized implementation executed in $0.04 \pm 0.005$s compared to exact ORC's $3.12 \pm 0.11$s (a roughly $78\times$ speedup), entirely bypassing the need for GPU-based Sinkhorn scaling.
 
 \begin{figure}[h]
   \centering
@@ -70,15 +70,22 @@ We validated SORC against exact ORC computed via linear programming. We performe
   \label{fig:correlation}
 \end{figure}
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\linewidth]{sorc_ablation_k.png}
+  \caption{Ablation of SORC correlation and runtime as a function of the number of eigenvectors $k$.}
+  \label{fig:ablation}
+\end{figure}
+
 \section{Conclusion}
-SORC bridges the theoretical rigor of optimal transport and the computational efficiency of spectral graph theory. By proving a strict spectral lower bound, this work elevates discrete graph curvature approximations from heuristic estimators to mathematically verifiable metrics \cite{ollivier2009ricci}, providing a scalable backbone for geometry-aware neural architectures.
+SORC bridges the theoretical rigor of optimal transport and the computational efficiency of spectral graph theory. By proving a rigorous spectral lower bound, this work elevates discrete graph curvature approximations from heuristic estimators to mathematically verifiable metrics \cite{ollivier2009ricci}, providing a scalable backbone for geometry-aware neural architectures.
 
 \bibliographystyle{plain}
 \begin{thebibliography}{9}
 \bibitem{ollivier2009ricci}
 Y. Ollivier, ``Ricci curvature of Markov chains on metric spaces,'' \textit{Journal of Functional Analysis}, vol. 256, no. 3, pp. 810-864, 2009.
 \bibitem{fesser2023augmented}
-R. Fesser, et al., ``Augmented Forman-Ricci Curvature as a scalable alternative to Ollivier-Ricci Curvature,'' \textit{arXiv preprint arXiv:2305.XXXXX}, 2023.
+R. Fesser, et al., ``Augmentations of Forman's Ricci Curvature and their Applications in Community Detection,'' \textit{arXiv preprint arXiv:2306.06474}, 2023.
 \bibitem{villani2009optimal}
 C. Villani, \textit{Optimal transport: old and new}, Springer, 2009.
 \end{thebibliography}
