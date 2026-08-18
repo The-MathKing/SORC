@@ -2,7 +2,7 @@ import numpy as np
 import networkx as nx
 import scipy.sparse as sp
 from scipy.sparse.linalg import eigsh
-from scipy.stats import wasserstein_1d
+from scipy.stats import wasserstein_distance
 import time
 
 def compute_sorc(G, k=10, alpha=0.5):
@@ -92,7 +92,7 @@ def compute_sorc(G, k=10, alpha=0.5):
             v_vals = F[supp_v, i]
             
             # Compute 1D Wasserstein distance
-            w1 = wasserstein_1d(u_vals, v_vals, w_u, w_v)
+            w1 = wasserstein_distance(u_vals, v_vals, w_u, w_v)
             if w1 > max_w1:
                 max_w1 = w1
                 
