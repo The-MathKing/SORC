@@ -51,7 +51,7 @@ In this paper, we propose a spectral optimal transport approach: Sliced Ollivier
 
 \section{Definitions and Theoretical Results}
 
-Let $G = (V, E)$ be an unweighted, undirected graph. For any vertex $u$, we define the local random walk measure with idleness $\alpha=0.5$ as $m_u^\alpha = \alpha\delta_u + (1-\alpha)\text{Unif}(N(u))$. The standard ORC along edge $\{u,v\}$ is $\kappa_{\text{ORC}}(u,v) = 1 - W_1(m_u^\alpha, m_v^\alpha)/d(u,v)$.
+Let $G = (V, E)$ be an unweighted, undirected graph. We assume $G$ is connected, so that $d$ is a finite metric and $\lambda_1 = 0$ is a simple eigenvalue of $L$ (hence $\phi_1$ is the unique eigenvector requiring exclusion). For any vertex $u$, we define the local random walk measure with idleness $\alpha=0.5$ as $m_u^\alpha = \alpha\delta_u + (1-\alpha)\text{Unif}(N(u))$. The standard ORC along edge $\{u,v\}$ is $\kappa_{\text{ORC}}(u,v) = 1 - W_1(m_u^\alpha, m_v^\alpha)/d(u,v)$.
 
 \subsection{Lipschitz Normalization of Eigenvectors}
 Let $\phi_i$ (for $i \ge 2$) be a non-trivial eigenvector of the graph Laplacian $L=D-A$, explicitly excluding the trivial constant vector $\phi_1$ corresponding to $\lambda_1 = 0$ to prevent division by zero. To utilize $\phi_i$ as a test function, it must be 1-Lipschitz with respect to the graph shortest-path metric $d(x,y)$. We compute the maximum edge gradient $\Delta_{\max}(\phi_i) = \max_{\{x,y\} \in E} |\phi_i(x) - \phi_i(y)|$, and define the normalized eigenvector $f_i = \phi_i / \Delta_{\max}(\phi_i)$.
@@ -62,7 +62,7 @@ Let $\text{SW}_k(m_u, m_v) = \max_{1 \le i \le k} W_1(f_{i\#}m_u, f_{i\#}m_v)$ b
 \begin{proof}
 It is a fundamental property of optimal transport that pushforward measures under a 1-Lipschitz map are non-expansive with respect to the 1-Wasserstein distance \cite{villani2009optimal}. Let $\pi$ be any optimal coupling of $(m_u, m_v)$ on the graph such that $\int d(x,y) d\pi(x,y) = W_1(m_u, m_v)$.
 
-By construction, each normalized eigenvector $f_i = \phi_i / \Delta_{\max}(\phi_i)$ is 1-Lipschitz with respect to the graph metric $d$. Therefore, for any $x, y \in V$, we have $|f_i(x) - f_i(y)| \le d(x,y)$. The pushforward $(f_i \times f_i)_\# \pi$ represents a valid transport plan between the 1D projected measures $f_{i\#}m_u$ and $f_{i\#}m_v$ on $\mathbb{R}$. 
+Since $\Delta_{\max}(\phi_i)$ bounds $|\phi_i(x) - \phi_i(y)|$ for every edge, summing this bound along a shortest $x$--$y$ path of length $d(x,y)$ gives $|f_i(x) - f_i(y)| \le d(x,y)$ for all $x, y \in V$. Thus, each normalized eigenvector $f_i = \phi_i / \Delta_{\max}(\phi_i)$ is 1-Lipschitz with respect to the graph metric $d$. The pushforward $(f_i \times f_i)_\# \pi$ represents a valid transport plan between the 1D projected measures $f_{i\#}m_u$ and $f_{i\#}m_v$ on $\mathbb{R}$. 
 
 The cost of this 1D coupling is strictly bounded by the cost of the graph coupling:
 \begin{align*}
