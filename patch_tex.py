@@ -39,11 +39,11 @@ def patch_tex(results):
     for ds in ["Amazon", "MovieLens"]:
         if ds in results:
             if ds == "Amazon":
-                pattern = r"(Amazon Video Games\s*&)[^\\\n]+&[^\\\n]+&[^\\\n]+&[^\\\n]+\\\\"
-                tex = re.sub(pattern, lambda m: f"{m.group(1)} {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & {results[ds]['SORC']} \\\\", tex)
+                pattern = r"(Amazon Video Games\s*&).*?\\\\"
+                tex = re.sub(pattern, lambda m: f"{m.group(1)} {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & {results[ds]['SORC']} \\\\", tex, flags=re.DOTALL)
             elif ds == "MovieLens":
-                pattern = r"(MovieLens-1M\s*&)[^\\\n]+&[^\\\n]+&[^\\\n]+&[^\\\n]+\\\\"
-                tex = re.sub(pattern, lambda m: f"{m.group(1)} {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & {results[ds]['SORC']} \\\\", tex)
+                pattern = r"(MovieLens-1M\s*&).*?\\\\"
+                tex = re.sub(pattern, lambda m: f"{m.group(1)} {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & {results[ds]['SORC']} \\\\", tex, flags=re.DOTALL)
                 
     with open('sorc_manuscript.tex', 'w') as f:
         f.write(tex)
