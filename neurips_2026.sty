@@ -1,0 +1,68 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{neurips_2026}[2026/08/17 NeurIPS 2026 submission style]
+
+\newif\if@neuripsfinal \@neuripsfinalfalse
+\newif\if@neuripspreprint \@neuripspreprintfalse
+
+\DeclareOption{final}{\@neuripsfinaltrue}
+\DeclareOption{preprint}{\@neuripspreprinttrue}
+\ProcessOptions\relax
+
+\RequirePackage{geometry}
+\geometry{
+  textheight=9in,
+  textwidth=5.5in,
+  top=1in,
+  headheight=12pt,
+  headsep=25pt,
+  footskip=30pt
+}
+
+\RequirePackage{times}
+\RequirePackage{lineno}
+
+\if@neuripsfinal
+  \relax
+\else
+  \if@neuripspreprint
+    \relax
+  \else
+    \linenumbers
+  \fi
+\fi
+
+\def\@maketitle{%
+  \vbox{%
+    \hsize\textwidth
+    \linewidth\hsize
+    \vskip 0.1in
+    \hrule height 4pt
+    \vskip 0.25in
+    \centering
+    {\LARGE\bf \@title \par}
+    \vskip 0.2in
+    \hrule height 1pt
+    \vskip 0.25in
+    \if@neuripsfinal
+      \def\And{%
+        \end{tabular}\hfil\linebreak[0]\hfil
+        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+      }
+      \def\AND{%
+        \end{tabular}\hfil\linebreak[4]\hfil
+        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+      }
+      \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\@author\end{tabular}%
+    \else
+      \if@neuripspreprint
+        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\@author\end{tabular}%
+      \else
+        Anonymous Author(s)\\
+        Affiliation\\
+        Address\\
+        \texttt{email}
+      \fi
+    \fi
+    \vskip 0.3in
+  }%
+}
