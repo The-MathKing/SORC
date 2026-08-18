@@ -7,12 +7,29 @@ def parse_results(filename):
         lines = f.readlines()
         for line in lines[1:]:
             parts = line.strip().split(',')
+            if len(parts) < 5: continue
             dataset = parts[0]
-            svd = parts[1]
-            gcn = parts[2]
-            afrc = parts[3]
-            sorc = parts[4]
-            results[dataset] = {"SVD": svd, "GCN": gcn, "AFRC": afrc, "SORC": sorc}
+            # parse the mean value to determine which one is highest
+            vals = []
+            for p in parts[1:]:
+                # extract the mean from "mean\pmstd" or "mean"
+                mean_str = p.split('\\pm')[0]
+                try:
+                    vals.append(float(mean_str))
+                except ValueError:
+                    vals.append(0.0)
+            
+            best_idx = vals.index(max(vals))
+            formatted = []
+            for i, p in enumerate(parts[1:]):
+                # Ensure it's treated as math mode to render \pm correctly
+                math_p = f"${p}$"
+                if i == best_idx:
+                    formatted.append(f"\\textbf{{{math_p}}}")
+                else:
+                    formatted.append(math_p)
+                    
+            results[dataset] = {"SVD": formatted[0], "GCN": formatted[1], "AFRC": formatted[2], "SORC": formatted[3]}
     return results
 
 def patch_tex(results):
@@ -22,14 +39,11 @@ def patch_tex(results):
     for ds in ["Amazon", "MovieLens"]:
         if ds in results:
             if ds == "Amazon":
-                # Find line with Amazon Video Games & - & - & - & - \\
-                pattern = r"(Amazon Video Games\s*&)\s*[-.0-9]+\s*&\s*[-.0-9]+\s*&\s*[-.0-9]+\s*&\s*[-.0-9]+\s*\\\\"
-                replacement = f"\\1 {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & \\textbf{{{results[ds]['SORC']}}} \\\\"
-                tex = re.sub(pattern, replacement, tex)
+                pattern = r"(Amazon Video Games\s*&)[^\\\n]+&[^\\\n]+&[^\\\n]+&[^\\\n]+\\\\"
+                tex = re.sub(pattern, lambda m: f"{m.group(1)} {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & {results[ds]['SORC']} \\\\", tex)
             elif ds == "MovieLens":
-                pattern = r"(MovieLens-1M\s*&)\s*[-.0-9]+\s*&\s*[-.0-9]+\s*&\s*[-.0-9]+\s*&\s*[-.0-9]+\s*\\\\"
-                replacement = f"\\1 {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & \\textbf{{{results[ds]['SORC']}}} \\\\"
-                tex = re.sub(pattern, replacement, tex)
+                pattern = r"(MovieLens-1M\s*&)[^\\\n]+&[^\\\n]+&[^\\\n]+&[^\\\n]+\\\\"
+                tex = re.sub(pattern, lambda m: f"{m.group(1)} {results[ds]['SVD']} & {results[ds]['GCN']} & {results[ds]['AFRC']} & {results[ds]['SORC']} \\\\", tex)
                 
     with open('sorc_manuscript.tex', 'w') as f:
         f.write(tex)
