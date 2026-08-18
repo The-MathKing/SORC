@@ -31,13 +31,13 @@
 \maketitle
 
 \begin{abstract}
-Discrete graph curvatures, particularly Ollivier-Ricci Curvature (ORC) and Forman-Ricci Curvature (FRC), have become foundational tools in geometric distributional deep learning for mitigating over-smoothing and over-squashing. While ORC provides a robust theoretical foundation based on optimal transport, its $\mathcal{O}(N^3)$ computational complexity limits scalability. Conversely, combinatorial approximations like FRC scale linearly but sacrifice the probabilistic mass-transport semantics. In this work, we bridge this divide by introducing Sliced Ollivier-Ricci Curvature (SORC). By projecting local random walk measures onto Lipschitz-normalized Laplacian eigenvectors, we compute localized 1D Sliced Wasserstein distances in closed form. We formally prove that SORC lower-bounds exact ORC via an optimal transport coupling formulation. Empirical evaluations on Stochastic Block Models demonstrate high correlation with exact ORC and significant runtime improvements, offering a highly tractable, mathematically rigorous metric for curvature-driven graph algorithms.
+Discrete graph curvatures, particularly Ollivier-Ricci Curvature (ORC) and Forman-Ricci Curvature (FRC), have become foundational tools in geometric distributional deep learning for mitigating over-smoothing and over-squashing. While ORC provides a robust theoretical foundation based on optimal transport, its $\mathcal{O}(N^3)$ computational complexity limits scalability. Conversely, combinatorial approximations like FRC scale linearly but sacrifice the probabilistic mass-transport semantics. In this work, we bridge this divide by introducing Sliced Ollivier-Ricci Curvature (SORC). By projecting local random walk measures onto Lipschitz-normalized Laplacian eigenvectors, we compute localized 1D Sliced Wasserstein distances in closed form. In this extended abstract, we present preliminary results on Sliced Ollivier-Ricci Curvature (SORC). We prove that SORC lower-bounds exact ORC via an optimal transport coupling formulation, and demonstrate that it offers a highly tractable, mathematically rigorous metric for curvature-driven graph algorithms.
 \end{abstract}
 
 \section{Introduction}
 The geometry of message passing in Graph Neural Networks (GNNs) is fundamentally dictated by the underlying graph topology. Recent advances in geometric deep learning have established that negative curvature induces over-squashing due to bottleneck structures, while positive curvature exacerbates over-smoothing. Ollivier-Ricci Curvature (ORC) mitigates these issues by quantifying neighborhood overlap via the 1-Wasserstein ($W_1$) distance, but requires solving an expensive linear program for every edge. 
 
-To overcome this, combinatorial surrogates such as Augmented Forman-Ricci Curvature (AFRC) count local cycles to approximate optimal transport. However, these heuristics lack the strict measure-theoretic foundation of exact ORC. In this paper, we propose a spectral optimal transport approach: Sliced Ollivier-Ricci Curvature (SORC). We demonstrate that by carefully normalizing the eigenvectors of the graph Laplacian, the 1D Wasserstein distance along these spectral projections yields a mathematically provable lower bound on exact ORC, computable in a fraction of the time.
+To overcome this, combinatorial surrogates such as Augmented Forman-Ricci Curvature (AFRC) count local cycles to approximate optimal transport. Other approaches, such as Lin-Lu-Yau curvature \cite{lin2011ricci}, approximate the transport plan but remain computationally demanding. Meanwhile, sliced Wasserstein distances have seen broad adoption in continuous machine learning domains \cite{kolouri2019generalized} but remain under-explored for discrete graphs. In this paper, we propose a spectral optimal transport approach: Sliced Ollivier-Ricci Curvature (SORC). We demonstrate that by carefully normalizing the eigenvectors of the graph Laplacian, the 1D Wasserstein distance along these spectral projections yields a mathematically provable lower bound on exact ORC, computable in a fraction of the time.
 
 \section{Definitions and Theoretical Results}
 
@@ -49,8 +49,8 @@ Let $\phi_i$ (for $i \ge 2$) be a non-trivial eigenvector of the graph Laplacian
 \begin{theorem}
 Let $\text{SW}_k(m_u, m_v) = \max_{1 \le i \le k} W_1(f_{i\#}m_u, f_{i\#}m_v)$ be the maximum 1D Sliced Wasserstein distance along the first $k$ Lipschitz-normalized Laplacian eigenvectors. Then, $\text{SW}_k(m_u, m_v) \le W_1(m_u, m_v)$.
 \end{theorem}
-\begin{proof}
-It is a standard fact in optimal transport that pushforward under a 1-Lipschitz map is non-expansive in $W_1$ \cite{villani2009optimal}. Specifically, since each normalized eigenvector $f_i$ is 1-Lipschitz with respect to the graph metric $d$, for any optimal coupling $\pi$ of $(m_u, m_v)$ on the graph, the pushforward $(f_i \times f_i)_\# \pi$ is a valid coupling of the pushforward measures on $\mathbb{R}$. Its cost is $\int |f_i(x) - f_i(y)| d\pi(x,y) \le \int d(x,y) d\pi(x,y) = W_1(m_u, m_v)$. Since the 1D Wasserstein distance $W_1(f_{i\#}m_u, f_{i\#}m_v)$ is the infimum over all such couplings on $\mathbb{R}$, it must be $\le$ the cost of this particular coupling. Taking the maximum over $k$ directions preserves this inequality.
+\begin{proof}[Proof Sketch]
+It is a standard fact in optimal transport that pushforward under a 1-Lipschitz map is non-expansive in $W_1$ \cite{villani2009optimal}. By establishing that our normalized eigenvectors $f_i$ are 1-Lipschitz on the graph, we can project the random walk measures into 1D space without expanding the Wasserstein cost. The full derivation of the coupling inequality is deferred to Appendix~\ref{sec:proof}.
 \end{proof}
 
 \begin{corollary}
@@ -89,6 +89,15 @@ Y. Ollivier, ``Ricci curvature of Markov chains on metric spaces,'' \textit{Jour
 R. Fesser, et al., ``Augmentations of Forman's Ricci Curvature and their Applications in Community Detection,'' \textit{arXiv preprint arXiv:2306.06474}, 2023.
 \bibitem{villani2009optimal}
 C. Villani, \textit{Optimal transport: old and new}, Springer, 2009.
+\bibitem{lin2011ricci}
+Y. Lin, L. Lu, and S. T. Yau, ``Ricci curvature of graphs,'' \textit{Tohoku Math. J.}, 2011.
+\bibitem{kolouri2019generalized}
+S. Kolouri, et al., ``Generalized Sliced Wasserstein Distances,'' \textit{NeurIPS}, 2019.
 \end{thebibliography}
+
+\appendix
+\section{Omitted Proofs}
+\label{sec:proof}
+\textbf{Proof of Theorem 1.} Since each normalized eigenvector $f_i$ is 1-Lipschitz with respect to the graph metric $d$, for any optimal coupling $\pi$ of $(m_u, m_v)$ on the graph, the pushforward $(f_i \times f_i)_\# \pi$ is a valid coupling of the pushforward measures on $\mathbb{R}$. Its cost is bounded by $\int |f_i(x) - f_i(y)| d\pi(x,y) \le \int d(x,y) d\pi(x,y) = W_1(m_u, m_v)$. Since the 1D Wasserstein distance $W_1(f_{i\#}m_u, f_{i\#}m_v)$ is the infimum over all such couplings on $\mathbb{R}$, it must be $\le$ the cost of this particular coupling. Taking the maximum over $k$ directions preserves this inequality. \qedsymbol
 
 \end{document}
