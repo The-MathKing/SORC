@@ -19,7 +19,7 @@
 
 \author{
   Aryan Padarthi \\
-  \texttt{aryanpadarthi@example.com}
+  \texttt{aryan.padarthi@gmail.com}
 }
 
 \newtheorem{theorem}{Theorem}
@@ -56,7 +56,7 @@ It is a standard fact in optimal transport that pushforward under a 1-Lipschitz 
 The Sliced Ollivier-Ricci Curvature $\kappa_{\text{SORC}}^{(k)}(u,v) = 1 - \text{SW}_k(m_u^\alpha, m_v^\alpha)/d(u,v)$ guarantees that $\kappa_{\text{SORC}}^{(k)}(u,v) \ge \kappa_{\text{ORC}}(u,v)$.
 \end{corollary}
 
-While the bound monotonically tightens as $k \to n$, the maximum over the spectral axes limits the exact recovery of $W_1$ to cases where the optimal coupling perfectly aligns with a single eigenvector. Otherwise, strict inequality holds. In practice, however, this lower bound serves as a highly accurate proxy.
+While the bound monotonically tightens as $k \to n$, the maximum over the spectral axes limits the exact recovery of $W_1$ to cases where the optimal coupling perfectly aligns with a single eigenvector. Otherwise, we conjecture that strict inequality holds. In practice, however, this lower bound serves as a highly accurate proxy.
 
 \section{Implementation and Empirical Validation}
 Computing SORC requires $\mathcal{O}(k|E|)$ for the Lanczos Laplacian decomposition and Lipschitz normalization, followed by closed-form 1D CDF differences across the $\deg(u)+\deg(v)$ points in the supports of adjacent measures. 
