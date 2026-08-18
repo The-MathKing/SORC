@@ -31,7 +31,7 @@
 \maketitle
 
 \begin{abstract}
-Discrete graph curvatures, particularly Ollivier-Ricci Curvature (ORC) and Forman-Ricci Curvature (FRC), have become foundational tools in geometric distributional deep learning for mitigating over-smoothing and over-squashing. While ORC provides a robust theoretical foundation based on optimal transport, its $\mathcal{O}(N^3)$ computational complexity limits scalability. Conversely, combinatorial approximations like FRC scale linearly but sacrifice the probabilistic mass-transport semantics. In this work, we bridge this divide by introducing Sliced Ollivier-Ricci Curvature (SORC). By projecting local random walk measures onto Lipschitz-normalized Laplacian eigenvectors, we compute localized 1D Sliced Wasserstein distances in closed form. We prove that SORC mathematically lower-bounds exact ORC via an optimal transport coupling formulation, and empirically demonstrate its efficacy. In comprehensive evaluations spanning stochastic block models and large real-world recommendation graphs, SORC achieves a dramatic speedup over exact ORC while preserving high topological correlation, significantly outperforming purely combinatorial approximations in downstream link prediction tasks. Code is provided in the supplementary material for anonymous review.
+Discrete graph curvatures, particularly Ollivier-Ricci Curvature (ORC) and Forman-Ricci Curvature (FRC), have become foundational tools in geometric distributional deep learning for mitigating over-smoothing and over-squashing. While ORC provides a robust theoretical foundation based on optimal transport, its $\mathcal{O}(N^3)$ computational complexity limits scalability. Conversely, combinatorial approximations like FRC scale linearly but sacrifice the probabilistic mass-transport semantics. In this work, we bridge this divide by introducing Sliced Ollivier-Ricci Curvature (SORC). By projecting local random walk measures onto Lipschitz-normalized Laplacian eigenvectors, we compute localized 1D Sliced Wasserstein distances in closed form. We prove that SORC mathematically lower-bounds exact ORC via an optimal transport coupling formulation, and empirically demonstrate its efficacy. In comprehensive evaluations spanning stochastic block models and large real-world recommendation graphs, SORC achieves a dramatic speedup over exact ORC while preserving high topological correlation, achieving moderate correlation in downstream link prediction tasks, though it does not fully match purely combinatorial approximations. Code is provided in the supplementary material for anonymous review.
 \end{abstract}
 
 \section{Introduction}
@@ -100,7 +100,7 @@ To evaluate the downstream applicability of SORC, we conducted a link prediction
 We formulated the link prediction task by randomly masking 10\% of the observed edges. The task evaluates the model's ability to rank the masked positive edges above uniformly sampled negative non-edges using the Area Under the Receiver Operating Characteristic Curve (AUC). We benchmarked curvature scoring (SORC and AFRC) against a classic Truncated SVD baseline ($k=64$) and a standard Graph Neural Network (LightGCN) trained using Bayesian Personalized Ranking loss over 30 epochs.
 
 \begin{table}[h]
-  \caption{Link Prediction AUC on Real-World Datasets. SORC outperforms combinatorial metrics and provides strong predictive signal.}
+  \caption{Link Prediction AUC on Real-World Datasets. SORC achieves moderate correlation, though exact SVD factorization provides a stronger predictive signal.}
   \label{tab:link_prediction}
   \centering
   \begin{tabular}{lcccc}
@@ -113,7 +113,7 @@ We formulated the link prediction task by randomly masking 10\% of the observed 
   \end{tabular}
 \end{table}
 
-As shown in Table~\ref{tab:link_prediction}, SORC provides a robust, zero-shot structural heuristic for link prediction. While state-of-the-art embedding methods like LightGCN perform strongly, they require iterative optimization and gradient descent. SORC, relying purely on closed-form spectral projections, significantly outperforms the combinatorial AFRC baseline and proves highly competitive as a scalable geometric feature for large networks.
+As shown in Table~\ref{tab:link_prediction}, SORC provides a scalable structural heuristic for link prediction. While state-of-the-art embedding methods like LightGCN perform strongly, they require iterative optimization and gradient descent. SORC, relying purely on closed-form spectral projections, provides a theoretically grounded lower bound to exact optimal transport, though empirically it struggles to match the strong correlation of purely combinatorial approaches like AFRC or dense SVD embeddings on massive real-world recommendation graphs.
 
 \begin{figure}[h]
   \centering
