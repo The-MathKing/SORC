@@ -101,10 +101,8 @@ def run_pipeline(dataset_name, A_full, num_users):
     L = D - A_train
     import scipy.linalg as la
     L_dense = L.toarray()
-    num_eigs = min(15 + 1, n - 1)
-    vals, vecs = la.eigh(L_dense, subset_by_index=[0, num_eigs-1])
-    idx_sort = np.argsort(vals)
-    vecs = vecs[:, idx_sort[1:]]
+    num_eigs = min(15, n - 1)
+    vals, vecs = la.eigh(L_dense, subset_by_index=[n-num_eigs, n-1])
     
     # Find max differences along training edges to normalize
     edge_diffs = np.abs(vecs[train_rows, :] - vecs[train_cols, :])
@@ -129,14 +127,13 @@ def run_pipeline(dataset_name, A_full, num_users):
     def score_sorc(u, v):
         supp_u, w_u = node_supports[u]
         supp_v, w_v = node_supports[v]
-        max_w1 = 0.0
+        w1_sum = 0.0
         for i in range(F_norm.shape[1]):
             u_vals = F_norm[supp_u, i]
             v_vals = F_norm[supp_v, i]
-            w1 = wasserstein_distance(u_vals, v_vals, w_u, w_v)
-            if w1 > max_w1:
-                max_w1 = w1
-        return 1.0 - max_w1 # Higher SORC -> More likely an edge
+            w1_sum += wasserstein_distance(u_vals, v_vals, w_u, w_v)
+        mean_w1 = w1_sum / F_norm.shape[1]
+        return 1.0 - mean_w1 # Higher SORC -> More likely an edge
         
     def score_fstar(u, v):
         du, dv = d[u], d[v]

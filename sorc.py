@@ -30,14 +30,9 @@ def compute_sorc(G, k=10, alpha=0.5):
     D = sp.diags(degrees)
     L = D - A
     
-    # Compute bottom k+1 eigenvectors (using shift-invert mode for smallest eigenvalues)
-    # sigma=-1e-3 helps find eigenvalues near 0 robustly
-    num_eigs = min(k + 1, n - 1)
-    vals, vecs = eigsh(L.astype(float), k=num_eigs, which='SM', sigma=-1e-3)
-    
-    # Sort eigenvalues and discard the first trivial one (lambda=0)
-    idx_sort = np.argsort(vals)
-    vecs = vecs[:, idx_sort[1:]]
+    # Compute top k eigenvectors (high-frequency components)
+    num_eigs = min(k, n - 1)
+    vals, vecs = eigsh(L.astype(float), k=num_eigs, which='LA')
     
     # 2. Lipschitz Normalization
     # For each eigenvector, we find the maximum absolute difference across all edges
@@ -83,7 +78,7 @@ def compute_sorc(G, k=10, alpha=0.5):
         supp_u, w_u = node_supports[idx_u_node]
         supp_v, w_v = node_supports[idx_v_node]
         
-        max_w1 = 0.0
+        w1_sum = 0.0
         
         # Project onto each normalized eigenvector
         for i in range(F.shape[1]):
@@ -92,12 +87,11 @@ def compute_sorc(G, k=10, alpha=0.5):
             v_vals = F[supp_v, i]
             
             # Compute 1D Wasserstein distance
-            w1 = wasserstein_distance(u_vals, v_vals, w_u, w_v)
-            if w1 > max_w1:
-                max_w1 = w1
+            w1_sum += wasserstein_distance(u_vals, v_vals, w_u, w_v)
                 
         # k_SORC = 1 - W1 / d(u,v), where d(u,v) = 1 for edges
-        edge_sorc[(u, v)] = 1.0 - max_w1
+        mean_w1 = w1_sum / F.shape[1]
+        edge_sorc[(u, v)] = 1.0 - mean_w1
         edge_sorc[(v, u)] = edge_sorc[(u, v)]
         
     runtime = time.time() - start_time
